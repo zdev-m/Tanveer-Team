@@ -904,6 +904,9 @@
             margin: 0 auto;
             padding: 0 24px;
         }
+        @media (min-width: 1280px) {
+            .hero .container { max-width: 1320px; }
+        }
         section {
             padding: 80px 0;
             position: relative;
@@ -989,8 +992,8 @@
         }
         .hero-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 50px;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 56px;
             align-items: center;
         }
         .hero-badge {
@@ -1152,12 +1155,15 @@
         .hero-visual {
             position: relative;
             width: 100%;
-            max-width: 500px;
+            max-width: 620px;
             aspect-ratio: 4/3;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        @media (min-width: 1280px) {
+            .hero-visual { max-width: 680px; }
         }
         .hero-visual::before {
             content: '';
@@ -1199,9 +1205,9 @@
             object-fit: contain;
             object-position: center;
             display: block;
-            -webkit-mask-image: radial-gradient(ellipse 78% 78% at 50% 50%, #000 68%, transparent 100%);
-            mask-image: radial-gradient(ellipse 78% 78% at 50% 50%, #000 68%, transparent 100%);
-            filter: drop-shadow(0 20px 50px rgba(59, 130, 246, 0.28));
+            -webkit-mask-image: radial-gradient(ellipse 96% 96% at 50% 50%, #000 88%, transparent 100%);
+            mask-image: radial-gradient(ellipse 96% 96% at 50% 50%, #000 88%, transparent 100%);
+            filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.45)) drop-shadow(0 25px 45px rgba(6, 182, 212, 0.22));
             transform: scale(1);
             animation: heroKenBurns 8s ease-in-out infinite alternate;
             will-change: transform;
@@ -1214,7 +1220,7 @@
             .hero-slide img { animation: none; }
         }
 
-        /* prev / next arrows — minimal glass buttons, no boxy container */
+        /* prev / next arrows — fully transparent glassy, no solid background */
         .hero-slider-arrow {
             position: absolute;
             top: 50%;
@@ -1222,10 +1228,10 @@
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            border: 1px solid var(--border-glass);
-            background: rgba(17, 24, 39, 0.35);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(8px) saturate(140%);
+            -webkit-backdrop-filter: blur(8px) saturate(140%);
             color: var(--text-primary);
             display: flex;
             align-items: center;
@@ -1233,15 +1239,16 @@
             cursor: pointer;
             z-index: 3;
             opacity: 0;
-            transition: opacity 0.3s, background 0.3s, border-color 0.3s, transform 0.2s;
+            transition: opacity 0.3s, background 0.3s, border-color 0.3s, transform 0.2s, box-shadow 0.3s;
         }
         .hero-visual:hover .hero-slider-arrow,
         .hero-slider-arrow:focus-visible {
-            opacity: 0.9;
+            opacity: 0.85;
         }
         .hero-slider-arrow:hover {
-            background: var(--blue);
-            border-color: var(--blue);
+            background: rgba(59, 130, 246, 0.16);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 16px rgba(59, 130, 246, 0.35);
             transform: translateY(-50%) scale(1.08);
         }
         .hero-slider-arrow svg { width: 16px; height: 16px; }
@@ -1249,8 +1256,13 @@
         .hero-slider-arrow.next { right: -6px; }
 
         body.light-mode .hero-slider-arrow {
-            background: rgba(255, 255, 255, 0.55);
-            border-color: rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(0, 0, 0, 0.10);
+            color: var(--text-primary);
+        }
+        body.light-mode .hero-slider-arrow:hover {
+            background: rgba(59, 130, 246, 0.14);
+            border-color: rgba(59, 130, 246, 0.4);
         }
 
         .hero-slider-dots {
@@ -1309,7 +1321,7 @@
         }
 
         @media (max-width: 768px) {
-            .hero-slider-arrow { opacity: 0.75; width: 32px; height: 32px; }
+            .hero-slider-arrow { opacity: 0.65; width: 32px; height: 32px; }
             .hero-slider-arrow.prev { left: 2px; }
             .hero-slider-arrow.next { right: 2px; }
         }
