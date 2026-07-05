@@ -1219,6 +1219,9 @@
         @media (prefers-reduced-motion: reduce) {
             .hero-slide img { animation: none; }
         }
+        body.is-scrolling .hero-slide img {
+            animation-play-state: paused;
+        }
 
         .hero-visual-glow {
             position: absolute;
@@ -2271,10 +2274,10 @@
                         <div class="hero-visual-glow2"></div>
 
                         <div class="hero-slider" id="heroSlider">
-                            <div class="hero-slide is-active" data-theme="dark">
+                            <div class="hero-slide is-active" data-theme="light">
                                 <img src="Image/Picture.jpg" alt="eBay dropshipping service" loading="eager" />
                             </div>
-                            <div class="hero-slide" data-theme="light">
+                            <div class="hero-slide" data-theme="dark">
                                 <img src="Image/Picture2.jpg" alt="eBay dropshipping service" loading="lazy" />
                             </div>
                         </div>
@@ -2626,6 +2629,12 @@
                 });
                 ticking = true;
             }
+            // pause heavy/animated visuals while actively scrolling to prevent jank
+            document.body.classList.add('is-scrolling');
+            clearTimeout(window._scrollStopTimer);
+            window._scrollStopTimer = setTimeout(function() {
+                document.body.classList.remove('is-scrolling');
+            }, 200);
         }, { passive: true });
 
         backTop.addEventListener('click', function() {
@@ -2730,26 +2739,30 @@
         });
 
         // ============================================================
-        // STAT COUNTERS (lighter)
+        // STAT COUNTERS — replays every time it scrolls into view
         // ============================================================
         var statObs = new IntersectionObserver(function(entries) {
             entries.forEach(function(e) {
+                var el = e.target;
+                var suffix = el.dataset.suffix || '';
                 if (e.isIntersecting) {
-                    var el = e.target;
                     var target = +el.dataset.target;
-                    var suffix = el.dataset.suffix || '';
                     var dur = 1600;
                     var start = performance.now();
+                    var runId = (el._runId = (el._runId || 0) + 1);
 
                     (function tick(now) {
+                        if (runId !== el._runId) return; // a newer run superseded this one
                         var p = Math.min((now - start) / dur, 1);
                         var eased = 1 - Math.pow(1 - p, 3);
                         el.textContent = Math.floor(target * eased).toLocaleString() + suffix;
                         if (p < 1) requestAnimationFrame(tick);
                         else el.textContent = target.toLocaleString() + suffix;
                     })(start);
-
-                    statObs.unobserve(el);
+                } else {
+                    // reset so it visibly rolls up again next time it comes into view
+                    el._runId = (el._runId || 0) + 1;
+                    el.textContent = '0' + suffix;
                 }
             });
         }, { threshold: 0.35 });
@@ -2810,6 +2823,7 @@
         (function drawParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             var len = particles.length;
+            var lightWork = document.body.classList.contains('is-scrolling');
             for (var i = 0; i < len; i++) {
                 var p = particles[i];
                 p.x += p.vx;
@@ -2821,19 +2835,21 @@
                 ctx.fillStyle = 'rgba(59, 130, 246, ' + p.o + ')';
                 ctx.fill();
             }
-            for (var i = 0; i < len; i++) {
-                for (var j = i + 1; j < len; j++) {
-                    var dx = particles[i].x - particles[j].x;
-                    var dy = particles[i].y - particles[j].y;
-                    var d = dx * dx + dy * dy;
-                    if (d < 10000) {
-                        var dist = Math.sqrt(d);
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = 'rgba(59, 130, 246, ' + (0.04 * (1 - dist / 100)) + ')';
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
+            if (!lightWork) {
+                for (var i = 0; i < len; i++) {
+                    for (var j = i + 1; j < len; j++) {
+                        var dx = particles[i].x - particles[j].x;
+                        var dy = particles[i].y - particles[j].y;
+                        var d = dx * dx + dy * dy;
+                        if (d < 10000) {
+                            var dist = Math.sqrt(d);
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = 'rgba(59, 130, 246, ' + (0.04 * (1 - dist / 100)) + ')';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
                     }
                 }
             }
