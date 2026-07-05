@@ -1021,9 +1021,9 @@
             font-family: var(--font-display);
             font-size: clamp(2.6rem, 6vw, 4.2rem);
             font-weight: 800;
-            line-height: 1.02;
-            letter-spacing: -0.04em;
-            margin-bottom: 16px;
+            line-height: 1.18;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
             color: var(--text-primary);
             transition: color 0.4s;
         }
@@ -1219,79 +1219,6 @@
         @media (prefers-reduced-motion: reduce) {
             .hero-slide img { animation: none; }
         }
-
-        /* prev / next arrows — icon only, no circle/background/blur, desktop only */
-        .hero-slider-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 38px;
-            height: 38px;
-            border-radius: 0;
-            border: none;
-            background: transparent;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 3;
-            opacity: 0;
-            filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.35));
-            transition: opacity 0.3s, transform 0.2s, filter 0.3s;
-        }
-        .hero-visual:hover .hero-slider-arrow,
-        .hero-slider-arrow:focus-visible {
-            opacity: 0.85;
-        }
-        .hero-slider-arrow:hover {
-            color: var(--blue);
-            transform: translateY(-50%) scale(1.15);
-        }
-        .hero-slider-arrow svg { width: 22px; height: 22px; }
-        .hero-slider-arrow.prev { left: 4px; }
-        .hero-slider-arrow.next { right: 4px; }
-
-        body.light-mode .hero-slider-arrow {
-            color: var(--text-primary);
-            filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.5));
-        }
-        body.light-mode .hero-slider-arrow:hover {
-            color: var(--blue);
-        }
-
-        /* arrows are desktop-only; hidden on mobile/touch screens */
-        @media (max-width: 1024px) {
-            .hero-slider-arrow {
-                display: none;
-            }
-        }
-
-        .hero-slider-dots {
-            position: absolute;
-            left: 50%;
-            bottom: 2px;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 3;
-        }
-        .hero-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(148, 163, 184, 0.4);
-            cursor: pointer;
-            padding: 0;
-            transition: background 0.3s, width 0.3s, transform 0.2s;
-        }
-        .hero-dot.is-active {
-            width: 20px;
-            border-radius: 4px;
-            background: linear-gradient(90deg, var(--blue), var(--cyan));
-        }
-        .hero-dot:hover { transform: scale(1.15); }
 
         .hero-visual-glow {
             position: absolute;
@@ -2012,7 +1939,10 @@
                 justify-content: center;
             }
             .hero-visual {
-                max-width: 100%;
+                width: calc(100% + 32px);
+                max-width: calc(100% + 32px);
+                margin-left: -16px;
+                margin-right: -16px;
                 aspect-ratio: 16/10;
             }
 
@@ -2332,31 +2262,20 @@
                     </div>
 
                     <!-- ============================================================
-                    HERO VISUAL — IMAGE SLIDER
-                    Add more slides by copying a .hero-slide + its dot button.
+                    HERO VISUAL — THEME-SWITCHED IMAGE
+                    "dark" slide shows in dark mode, "light" slide shows in light mode.
+                    Swap the src values below to change which image is used for each theme.
                     ============================================================ -->
-                    <div class="hero-visual reveal reveal-delay-2" aria-label="Dropshipping services image slider">
+                    <div class="hero-visual reveal reveal-delay-2" aria-label="Dropshipping services illustration">
                         <div class="hero-visual-glow"></div>
                         <div class="hero-visual-glow2"></div>
 
                         <div class="hero-slider" id="heroSlider">
-                            <div class="hero-slide is-active">
+                            <div class="hero-slide is-active" data-theme="dark">
                                 <img src="Image/Picture.jpg" alt="eBay dropshipping service" loading="eager" />
                             </div>
-                            <div class="hero-slide">
+                            <div class="hero-slide" data-theme="light">
                                 <img src="Image/Picture2.jpg" alt="eBay dropshipping service" loading="lazy" />
-                            </div>
-
-                            <button type="button" class="hero-slider-arrow prev" aria-label="Previous slide">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                            </button>
-                            <button type="button" class="hero-slider-arrow next" aria-label="Next slide">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                            </button>
-
-                            <div class="hero-slider-dots" role="tablist" aria-label="Slide navigation">
-                                <button type="button" class="hero-dot is-active" data-index="0" aria-label="Go to slide 1"></button>
-                                <button type="button" class="hero-dot" data-index="1" aria-label="Go to slide 2"></button>
                             </div>
                         </div>
                     </div>
@@ -2922,71 +2841,35 @@
         })();
 
         // ============================================================
-        // HERO IMAGE SLIDER — autoplay, fade, arrows, dots, swipe
+        // HERO IMAGE — switches automatically with the site theme
+        // (dark-mode image shows in dark mode, light-mode image shows in light mode)
         // ============================================================
         (function() {
             var slider = document.getElementById('heroSlider');
             if (!slider) return;
 
             var slides = Array.prototype.slice.call(slider.querySelectorAll('.hero-slide'));
-            var dots = Array.prototype.slice.call(slider.querySelectorAll('.hero-dot'));
-            var prevBtn = slider.querySelector('.hero-slider-arrow.prev');
-            var nextBtn = slider.querySelector('.hero-slider-arrow.next');
-            var total = slides.length;
-            if (total < 2) return;
+            if (!slides.length) return;
 
-            var current = slides.findIndex(function(s) { return s.classList.contains('is-active'); });
-            if (current < 0) current = 0;
-            var timer = null;
-            var intervalMs = 4000;
-
-            function goTo(index) {
-                var next = ((index % total) + total) % total;
-                if (next === current) return;
-                slides[current].classList.remove('is-active');
-                if (dots[current]) dots[current].classList.remove('is-active');
-                current = next;
-                slides[current].classList.add('is-active');
-                if (dots[current]) dots[current].classList.add('is-active');
-            }
-            function nextSlide() { goTo(current + 1); }
-            function prevSlide() { goTo(current - 1); }
-            function start() {
-                stop();
-                timer = setInterval(nextSlide, intervalMs);
-            }
-            function stop() {
-                if (timer) { clearInterval(timer); timer = null; }
+            function syncHeroImageWithTheme() {
+                var isLight = document.body.classList.contains('light-mode');
+                var wanted = isLight ? 'light' : 'dark';
+                slides.forEach(function(slide) {
+                    var matches = slide.getAttribute('data-theme') === wanted;
+                    slide.classList.toggle('is-active', matches);
+                });
             }
 
-            if (nextBtn) nextBtn.addEventListener('click', function() { nextSlide(); start(); });
-            if (prevBtn) prevBtn.addEventListener('click', function() { prevSlide(); start(); });
-            dots.forEach(function(dot, i) {
-                dot.addEventListener('click', function() { goTo(i); start(); });
-            });
+            // run once on load
+            syncHeroImageWithTheme();
 
-            // touch swipe support (mobile)
-            var touchStartX = 0, touchDeltaX = 0;
-            slider.addEventListener('touchstart', function(e) {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-            slider.addEventListener('touchend', function(e) {
-                touchDeltaX = e.changedTouches[0].screenX - touchStartX;
-                if (Math.abs(touchDeltaX) > 40) {
-                    if (touchDeltaX < 0) nextSlide(); else prevSlide();
-                    start();
-                }
-            }, { passive: true });
-
-            // pause on hover/focus (desktop) and when tab is hidden (performance)
-            slider.addEventListener('mouseenter', stop);
-            slider.addEventListener('mouseleave', start);
-            document.addEventListener('visibilitychange', function() {
-                if (document.hidden) stop(); else start();
-            });
-
-            start();
+            // re-run every time the theme toggle changes
+            var themeToggleEl = document.getElementById('themeToggle');
+            if (themeToggleEl) {
+                themeToggleEl.addEventListener('change', syncHeroImageWithTheme);
+            }
         })();
+
     </script>
 </body>
 </html>
