@@ -1260,7 +1260,7 @@
                    ============================================================ */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 18px;
         }
         .feature-card {
@@ -1863,6 +1863,9 @@
                    RESPONSIVE
                    ============================================================ */
         @media (max-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .hero-grid {
                 grid-template-columns: 1fr;
                 gap: 36px;
